@@ -9,6 +9,7 @@ HowToEnrollModal = require 'views/teachers/HowToEnrollModal'
 TeachersContactModal = require 'views/teachers/TeachersContactModal'
 ActivateLicensesModal = require 'views/courses/ActivateLicensesModal'
 utils = require 'core/utils'
+ShareLicensesModal = require 'views/teachers/ShareLicensesModal'
 
 {
   STARTER_LICENSE_COURSE_IDS
@@ -135,3 +136,6 @@ module.exports = class EnrollmentsView extends RootView
     modal.once 'hidden', =>
       @prepaids.add(modal.prepaids.models, { merge: true })
       @debouncedRender() # Because one changed model does not a collection update make
+
+  onClickShareLicensesLink: ->
+    @openModalView(new ShareLicensesModal())
