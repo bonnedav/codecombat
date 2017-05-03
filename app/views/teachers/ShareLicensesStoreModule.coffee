@@ -3,16 +3,20 @@ module.exports = ShareLicensesStoreModule = {
   namespaced: true
   state: {
     _prepaid: { joiners: [] }
+    error: ''
   }
   mutations: {
+    # NOTE: Ideally, this store should fetch the prepaid, but we're already handed it by the Backbone parent
     setPrepaid: (state, prepaid) ->
       state._prepaid = prepaid
     addTeacher: (state, user) ->
       state._prepaid.joiners.push({
-        userID: user.id
+        userID: user._id
         name: user.name
         email: user.email
       })
+    setError: (state, error) ->
+      state.error = error
   }
   actions: {
     setPrepaid: ({ commit }, prepaid) ->
@@ -37,12 +41,14 @@ module.exports = ShareLicensesStoreModule = {
       $.get('/db/user', { email }).then (user) =>
         $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
           console.log "Added user to prepaid"
+          console.log state._prepaid.joiners.map((j)->j.userID)
           commit('addTeacher', user)
         , (e) ->
-          console.log e
+          commit('setError', e.responseJSON?.message)
+          console.log e.responseJSON?.message
       , (e) ->
-        commit('setError', 'userNotFound')
-        console.log e
+        commit('setError', e.responseJSON?.message)
+        console.log e.responseJSON?.message
       # TODO: Error handling?
       null
   }
@@ -55,6 +61,7 @@ module.exports = ShareLicensesStoreModule = {
               (not redeemer.teacherID and joiner.userID is me.id) or (redeemer.teacherID is joiner.userID)
             )[true] or 0
       })
+    error: (state) -> state.error
   }
 }
 

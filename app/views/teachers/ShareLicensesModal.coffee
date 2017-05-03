@@ -31,7 +31,7 @@ ShareLicensesComponent = Vue.extend
   data: ->
     me: me
     teacherSearchInput: 'phoenix+teacher5a@codecombat.com'#nocommit
-  computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid'))
+  computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid', error: 'shareLicenses/error'))
   components:
     'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
   methods:

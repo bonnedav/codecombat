@@ -6,21 +6,27 @@
   h4.m-t-5
     {{ $t("share_licenses.add_teacher_label") }}
   
-  .row
+  form.row
     .col-xs-8
       input(v-model:value="teacherSearchInput")
     .col-xs-4
-      button.btn.btn-navy(v-on:click="addTeacher")
+      button.add-teacher-btn.btn.btn-navy(v-on:click.prevent="addTeacher")
         span.m-l-1.m-r-1
           {{ $t("share_licenses.add_teacher_button") }}
+  
+  .row(v-if="error")
+    .col-xs-8
+      p.error-message.small
+        {{ error }}
   
   h4.m-t-5
     {{ $t("share_licenses.teachers_using_these") }}
   
-  div.m-b-5
-    li( is="share-licenses-joiner-row",
+  transition-group.m-b-5(name="list" tag="div")
+    li.list-item( is="share-licenses-joiner-row",
         v-for="joiner in prepaid.joiners",
-        :key="joiner.email",
+        v-if="joiner && prepaid",
+        :key="joiner.userID",
         :joiner="joiner",
         :prepaid="prepaid")
   

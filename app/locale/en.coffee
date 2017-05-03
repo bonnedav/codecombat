@@ -1609,7 +1609,7 @@
     subheader: "You can make your licenses available to other teachers in your organization. Each license can only be used for one student at a time."
     teacher_not_found: "Teacher not found. Please make sure this teacher has already created a Teacher Account."
     teacher_not_valid: "This is not a valid Teacher Account. Only teacher accounts can share licenses."
-    teachers_using_these: "Teachers using these licenses"
+    teachers_using_these: "Teachers using these licenses:"
     footer: "When teachers revoke licenses from students, the licenses will be returned to the shared pool for other teachers in this group to use."
     you: "(you)"
     one_license_used: "(1 license used)"
