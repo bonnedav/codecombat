@@ -11,7 +11,8 @@
       input(v-model:value="teacherSearchInput")
     .col-xs-4
       button.btn.btn-navy(v-on:click="findTeacher")
-        {{ $t("share_licenses.add_teacher_button") }}
+        span.m-l-1.m-r-1
+          {{ $t("share_licenses.add_teacher_button") }}
   
   h4.m-t-5
     {{ $t("share_licenses.teachers_using_these") }}
@@ -28,4 +29,5 @@
       {{ $t("share_licenses.footer") }}
   
     button.btn.btn-lg.btn-navy-alt
-      {{ $t("general.close_window") }}
+      span.m-l-3.m-r-3
+        {{ $t("general.close_window") }}
