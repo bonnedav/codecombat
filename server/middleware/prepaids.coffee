@@ -116,6 +116,38 @@ module.exports =
     prepaid.set('redeemers', _.filter(prepaid.get('redeemers') or [], (obj) -> not obj.userID.equals(user._id)))
     res.status(200).send(prepaid.toObject({req: req}))
 
+  # Add teachers to a Shared License
+  addJoiner: wrap (req, res) ->
+    if not req.user?.isTeacher()
+      throw new errors.Forbidden('Must be a teacher to share licenses')
+
+    prepaid = yield database.getDocFromHandle(req, Prepaid)
+    if not prepaid
+      throw new errors.NotFound('Prepaid not found.')
+
+    unless prepaid.get('creator').equals(req.user._id)
+      throw new errors.Forbidden('You may not share licenses you do not own.')
+    unless prepaid.get('type') is 'course'
+      throw new errors.Forbidden('This prepaid is not of type "course".')
+    
+    joiner = yield User.findById(req.body?.userID)
+    if not joiner
+      throw new errors.NotFound('User not found.')
+
+    if not joiner.isTeacher()
+      throw new errors.UnprocessableEntity('User to share with must be a Teacher.')
+    
+    query =
+      _id: prepaid._id
+    update = { $push: { joiners : { userID: joiner._id } }}
+    result = yield Prepaid.update(query, update)
+    if result.nModified is 0
+      @logError(req.user, "POST prepaid redeemer lost race on maxRedeemers")
+      throw new errors.UnprocessableEntity('User was not enrolled with this set of enrollments (race)')
+      
+    
+
+  
   fetchByCreator: wrap (req, res, next) ->
     creator = req.query.creator
     return next() if not creator

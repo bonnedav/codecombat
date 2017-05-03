@@ -3,6 +3,8 @@ State = require 'models/State'
 TrialRequests = require 'collections/TrialRequests'
 forms = require 'core/forms'
 store = require('core/store')
+ShareLicensesStoreModule = require('./ShareLicensesStoreModule')
+store.registerModule('shareLicenses', ShareLicensesStoreModule) #TODO: Do I use this or 'modal' namespace?
 
 module.exports = class ShareLicensesModal extends ModalView
   id: 'share-licenses-modal'
@@ -10,6 +12,7 @@ module.exports = class ShareLicensesModal extends ModalView
   events: {}
   initialize: (options={}) ->
     @shareLicensesComponent = null
+    store.dispatch('shareLicenses/setPrepaid', options.prepaid)
   afterRender: ->
     target = @$el.find('#share-licenses-component')
     if @shareLicensesComponent
@@ -23,19 +26,15 @@ module.exports = class ShareLicensesModal extends ModalView
 ShareLicensesComponent = Vue.extend
   name: 'share-licenses-component'
   template: require('templates/teachers/share-licenses-component')()
-  storeModule: require('./ShareLicensesStoreModule')
+  storeModule: ShareLicensesStoreModule
   created: ->
   data: ->
     me: me
-    teacherSearchInput: ''
-    prepaid:
-      joiners: [
-        {name: 'phoenix', email: 'phoenix+teacher3@codecombat.com', licensesUsed: 1}
-        {name: 'someone else', email: 'phoenix+teacher5a@codecombat.com', licensesUsed: 2}
-      ]
-  computed: {}
+    teacherSearchInput: 'phoenix+teacher5a@codecombat.com'#nocommit
+  computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid'))
   components:
     'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
   methods:
-    findTeacher: ->
-      console.log 'finding teacher!', @teacherSearchInput
+    addTeacher: ->
+      @$store.dispatch('shareLicenses/addTeacher', @teacherSearchInput)
+  created: ->

@@ -92,7 +92,7 @@ mixin prepaidCard(prepaid, className)
     else
       div(data-i18n="teacher.credits")
     hr
-    em.small-details
+    i.small-details
       .pull-left(data-i18n="teacher.start_date")
       .pull-right= moment(prepaid.get('startDate')).utc().format('l')
       .clearfix
@@ -100,6 +100,9 @@ mixin prepaidCard(prepaid, className)
       .pull-left(data-i18n="teacher.end_date")
       .pull-right= moment(prepaid.get('endDate')).utc().format('l')
       .clearfix
+  .small-details.pull-right
+    a.share-licenses-link(data-prepaid-id=prepaid.id)
+      | share licenses
 
 
 mixin addCredits

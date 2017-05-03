@@ -24,6 +24,7 @@ module.exports = class EnrollmentsView extends RootView
     'click #enroll-students-btn': 'onClickEnrollStudentsButton'
     'click #how-to-enroll-link': 'onClickHowToEnrollLink'
     'click #contact-us-btn': 'onClickContactUsButton'
+    'click .share-licenses-link': 'onClickShareLicensesLink'
 
   getTitle: -> return $.i18n.t('teacher.enrollments')
   
@@ -137,5 +138,6 @@ module.exports = class EnrollmentsView extends RootView
       @prepaids.add(modal.prepaids.models, { merge: true })
       @debouncedRender() # Because one changed model does not a collection update make
 
-  onClickShareLicensesLink: ->
-    @openModalView(new ShareLicensesModal())
+  onClickShareLicensesLink: (e) ->
+    prepaidID = $(e.currentTarget).data('prepaidId')
+    @openModalView(new ShareLicensesModal({prepaid: @prepaids.get(prepaidID).attributes}))
