@@ -130,6 +130,9 @@ module.exports =
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
     
+    if _.find(prepaid.get('joiners'), {userID: mongoose.Types.ObjectId(req.body?.userID)})
+      throw new errors.UnprocessableEntity("You've already shared these licenses with that teacher.")
+
     joiner = yield User.findById(req.body?.userID)
     if not joiner
       throw new errors.NotFound('User not found.')
@@ -144,9 +147,8 @@ module.exports =
     if result.nModified is 0
       @logError(req.user, "POST prepaid redeemer lost race on maxRedeemers")
       throw new errors.UnprocessableEntity('User was not enrolled with this set of enrollments (race)')
-      
     
-
+    res.status(200).send()
   
   fetchByCreator: wrap (req, res, next) ->
     creator = req.query.creator

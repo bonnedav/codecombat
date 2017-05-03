@@ -7,8 +7,12 @@ module.exports = ShareLicensesStoreModule = {
   mutations: {
     setPrepaid: (state, prepaid) ->
       state._prepaid = prepaid
-    addTeacher: (state, userID) ->
-      state._prepaid.joiners.push({userID})
+    addTeacher: (state, user) ->
+      state._prepaid.joiners.push({
+        userID: user.id
+        name: user.name
+        email: user.email
+      })
   }
   actions: {
     setPrepaid: ({ commit }, prepaid) ->
@@ -27,10 +31,19 @@ module.exports = ShareLicensesStoreModule = {
           email: me.get('email')
         })
         commit('setPrepaid', prepaid)
-    addTeacher: ({ commit }, email) ->
+    addTeacher: ({ commit, state }, email) ->
       # TODO: Use API for this instead
+      # TODO: Update the prepaid in the DB
       $.get('/db/user', { email }).then (user) =>
-        commit('addTeacher', user.id)
+        $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
+          console.log "Added user to prepaid"
+          commit('addTeacher', user)
+        , (e) ->
+          console.log e
+      , (e) ->
+        commit('setError', 'userNotFound')
+        console.log e
+      # TODO: Error handling?
       null
   }
   getters: {
