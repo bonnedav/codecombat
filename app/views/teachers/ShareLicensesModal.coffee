@@ -3,7 +3,6 @@ State = require 'models/State'
 TrialRequests = require 'collections/TrialRequests'
 forms = require 'core/forms'
 store = require('core/store')
-ShareLicensesStoreModule = require './ShareLicensesStoreModule'
 
 module.exports = class ShareLicensesModal extends ModalView
   id: 'share-licenses-modal'
@@ -24,9 +23,19 @@ module.exports = class ShareLicensesModal extends ModalView
 ShareLicensesComponent = Vue.extend
   name: 'share-licenses-component'
   template: require('templates/teachers/share-licenses-component')()
-  storeModule: ShareLicensesStoreModule
+  storeModule: require('./ShareLicensesStoreModule')
   created: ->
-  data: -> {}
+  data: ->
+    me: me
+    teacherSearchInput: ''
+    prepaid:
+      joiners: [
+        {name: 'phoenix', email: 'phoenix+teacher3@codecombat.com', licensesUsed: 1}
+        {name: 'someone else', email: 'phoenix+teacher5a@codecombat.com', licensesUsed: 2}
+      ]
   computed: {}
-  components: {}
-  methods: {}
+  components:
+    'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
+  methods:
+    findTeacher: ->
+      console.log 'finding teacher!', @teacherSearchInput

@@ -1,3 +1,31 @@
-#share-licenses-component.modal-body
-  div(style="width: 100px; height:100px")
-    | yay!
+#share-licenses-component.modal-body 
+  .text-center
+    p.small
+      {{ $t("share_licenses.subheader") }}
+  
+  h4.m-t-5
+    {{ $t("share_licenses.add_teacher_label") }}
+  
+  .row
+    .col-xs-8
+      input(v-model:value="teacherSearchInput")
+    .col-xs-4
+      button.btn.btn-navy(v-on:click="findTeacher")
+        {{ $t("share_licenses.add_teacher_button") }}
+  
+  h4.m-t-5
+    {{ $t("share_licenses.teachers_using_these") }}
+  
+  div.m-b-5
+    li( is="share-licenses-joiner-row",
+        v-for="joiner in prepaid.joiners",
+        :key="joiner.email",
+        :joiner="joiner",
+        :prepaid="prepaid")
+  
+  .text-center
+    p.small
+      {{ $t("share_licenses.footer") }}
+  
+    button.btn.btn-lg.btn-navy-alt
+      {{ $t("general.close_window") }}
