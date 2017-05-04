@@ -2,7 +2,7 @@ div.row.p-t-1.p-b-1(v-if="joiner")
   div.col-xs-8
     div
       b
-        {{ joiner.name }}
+        {{ broadName }}
         span(v-if="joiner.email === me.get('email')")
           = " "
           {{ $t("share_licenses.you") }}

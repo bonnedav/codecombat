@@ -1,5 +1,6 @@
 store = require('core/store')
 ShareLicensesStoreModule = require './ShareLicensesStoreModule'
+User = require 'models/User'
 
 module.exports = ShareLicensesJoinerRow =
   name: 'share-licenses-joiner-row'
@@ -16,7 +17,10 @@ module.exports = ShareLicensesJoinerRow =
   created: ->
   data: ->
     me: me
-  computed: {}
+  computed:
+    broadName: ->
+      console.log new User(@joiner)
+      (new User(@joiner)).broadName()
   components: {}
   methods:
     {}

@@ -30,24 +30,15 @@ module.exports = ShareLicensesStoreModule = {
       userRequests = prepaid.joiners.map (joiner) ->
         console.log "Requesting user for", joiner.userID
         api.users.getByHandle(joiner.userID).then (user) ->
-          _.assign(joiner, _.pick(user, 'name', 'email'))
-          # TODO: Make sure endpoint includes the email for this case
-          console.log "Got requested user:", user
+          _.assign(joiner, _.pick(user, 'name', 'firstName', 'lastName', 'email'))
       Promise.all(userRequests).then ->
-        # TODO: Only add 'me' if I've used any?
-        prepaid.joiners.push({
-          userID: me.id
-          name: me.get('name')
-          email: me.get('email')
-        })
+        prepaid.joiners.push(_.assign({ userID: me.id }, me.pick('name', 'firstName', 'lastName', 'email')))
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
       # TODO: Use API for this instead
       # TODO: Update the prepaid in the DB
       $.get('/db/user', { email }).then (user) =>
         $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
-          console.log "Added user to prepaid"
-          console.log state._prepaid.joiners.map((j)->j.userID)
           commit('addTeacher', user)
         , (e) ->
           commit('setError', e.responseJSON?.message)
