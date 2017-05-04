@@ -60,11 +60,18 @@ module.exports =
   fetchByEmail: wrap (req, res, next) ->
     email = req.query.email
     return next() unless email
-    throw new errors.Forbidden('Only admins can search by email') unless req.user?.isAdmin()
-    
-    user = yield User.findOne({ emailLower: email.toLowerCase() })
-    throw new errors.NotFound('No user with that email') unless user
-    res.status(200).send(user.toObject({req}))
+    if req.user?.isAdmin()
+      user = yield User.findOne({ emailLower: email.toLowerCase() })
+      throw new errors.NotFound('No user with that email') unless user
+      res.status(200).send(user.toObject({req}))
+    else if req.user?.isTeacher()
+      user = yield User.findOne({ emailLower: email.toLowerCase() })
+      throw new errors.NotFound('No user with that email') unless user
+      throw new errors.Forbidden('Teacher Accounts can only look up other Teacher Accounts.') unless user.isTeacher()
+      trimUser = _.pick(user.toObject(), ['_id', 'email', 'firstName', 'lastName', 'name'])
+      res.status(200).send(trimUser)
+    else
+      throw new errors.Forbidden('Only admins and teachers can search by email')
 
   removeFromClassrooms: wrap (req, res, next) ->
     yield req.user.removeFromClassrooms()
