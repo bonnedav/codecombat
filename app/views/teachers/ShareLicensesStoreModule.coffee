@@ -36,7 +36,6 @@ module.exports = ShareLicensesStoreModule = {
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
       # TODO: Use API for this instead
-      # TODO: Update the prepaid in the DB
       $.get('/db/user', { email }).then (user) =>
         $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
           commit('addTeacher', user)
