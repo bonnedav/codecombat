@@ -4,7 +4,6 @@ TrialRequests = require 'collections/TrialRequests'
 forms = require 'core/forms'
 store = require('core/store')
 ShareLicensesStoreModule = require('./ShareLicensesStoreModule')
-store.registerModule('shareLicenses', ShareLicensesStoreModule) #TODO: Do I use this or 'modal' namespace?
 
 module.exports = class ShareLicensesModal extends ModalView
   id: 'share-licenses-modal'
@@ -12,6 +11,7 @@ module.exports = class ShareLicensesModal extends ModalView
   events: {}
   initialize: (options={}) ->
     @shareLicensesComponent = null
+    store.registerModule('shareLicenses', ShareLicensesStoreModule) #TODO: Do I use this or 'modal' namespace?
     store.dispatch('shareLicenses/setPrepaid', options.prepaid)
   afterRender: ->
     target = @$el.find('#share-licenses-component')
@@ -22,6 +22,10 @@ module.exports = class ShareLicensesModal extends ModalView
         el: target[0]
         store
       })
+  destroy: ->
+    console.log "destroy"
+    @shareLicensesComponent.$destroy()
+    super(arguments...)
 
 ShareLicensesComponent = Vue.extend
   name: 'share-licenses-component'
@@ -32,9 +36,16 @@ ShareLicensesComponent = Vue.extend
     me: me
     teacherSearchInput: 'phoenix+teacher5a@codecombat.com'#nocommit
   computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid', error: 'shareLicenses/error'))
+  watch:
+    teacherSearchInput: ->
+      @$store.commit('shareLicenses/setError', '')
   components:
     'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
   methods:
     addTeacher: ->
       @$store.dispatch('shareLicenses/addTeacher', @teacherSearchInput)
   created: ->
+  destroyed: ->
+    console.log "destroyed"
+    @$store.commit('shareLicenses/clearData')
+    @$store.unregisterModule('shareLicenses')

@@ -1,10 +1,13 @@
 api = require 'core/api'
+
+initialState = {
+  _prepaid: { joiners: [] }
+  error: ''
+}
+
 module.exports = ShareLicensesStoreModule = {
   namespaced: true
-  state: {
-    _prepaid: { joiners: [] }
-    error: ''
-  }
+  state: _.cloneDeep(initialState)
   mutations: {
     # NOTE: Ideally, this store should fetch the prepaid, but we're already handed it by the Backbone parent
     setPrepaid: (state, prepaid) ->
@@ -17,9 +20,13 @@ module.exports = ShareLicensesStoreModule = {
       })
     setError: (state, error) ->
       state.error = error
+    clearData: (state) ->
+      _.assign state, initialState
   }
   actions: {
     setPrepaid: ({ commit }, prepaid) ->
+      prepaid = _.cloneDeep(prepaid)
+      prepaid.joiners ?= []
       userRequests = prepaid.joiners.map (joiner) ->
         console.log "Requesting user for", joiner.userID
         api.users.getByHandle(joiner.userID).then (user) ->
@@ -27,7 +34,6 @@ module.exports = ShareLicensesStoreModule = {
           # TODO: Make sure endpoint includes the email for this case
           console.log "Got requested user:", user
       Promise.all(userRequests).then ->
-        console.log prepaid
         # TODO: Only add 'me' if I've used any?
         prepaid.joiners.push({
           userID: me.id
@@ -49,7 +55,7 @@ module.exports = ShareLicensesStoreModule = {
       , (e) ->
         commit('setError', e.responseJSON?.message)
         console.log e.responseJSON?.message
-      # TODO: Error handling?
+      # TODO: Translate error messages
       null
   }
   getters: {

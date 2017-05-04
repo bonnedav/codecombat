@@ -129,8 +129,8 @@ module.exports =
       throw new errors.Forbidden('You may not share licenses you do not own.')
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
-    
-    if _.find(prepaid.get('joiners'), {userID: mongoose.Types.ObjectId(req.body?.userID)})
+
+    if _.find(prepaid.get('joiners'), {userID: mongoose.Types.ObjectId(req.body?.userID)}) or req.body?.userID is req.user.id
       throw new errors.UnprocessableEntity("You've already shared these licenses with that teacher.")
 
     joiner = yield User.findById(req.body?.userID)

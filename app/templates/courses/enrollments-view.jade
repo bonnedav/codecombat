@@ -85,12 +85,18 @@ block content
             +addCredits
 
 mixin prepaidCard(prepaid, className)
-  .prepaid-card.bg-navy.text-center.m-b-2.p-a-2(class=className)
+  .prepaid-card.bg-navy.text-center.p-a-2(class=className)
     h1.m-t-2.m-b-0= prepaid.openSpots()
     if prepaid.get('type') === 'starter_license'
       div(data-i18n="teacher.starter_licenses")
     else
-      div(data-i18n="teacher.credits")
+      div(data-i18n="teacher.licenses_remaining")
+    div.m-t-1
+      i
+        if prepaid.usedSpots() === 1
+          = translate('teacher.one_license_used')
+        else
+          = translate('teacher.num_licenses_used', {numLicensesUsed: prepaid.usedSpots()})
     hr
     i.small-details
       .pull-left(data-i18n="teacher.start_date")
@@ -100,7 +106,7 @@ mixin prepaidCard(prepaid, className)
       .pull-left(data-i18n="teacher.end_date")
       .pull-right= moment(prepaid.get('endDate')).utc().format('l')
       .clearfix
-  .small-details.pull-right
+  .small-details.pull-right.m-b-2
     a.share-licenses-link(data-prepaid-id=prepaid.id)
       | share licenses
 

@@ -10,6 +10,9 @@ module.exports = class Prepaid extends CocoModel
   openSpots: ->
     return @get('maxRedeemers') - @get('redeemers')?.length if @get('redeemers')?
     @get('maxRedeemers')
+  
+  usedSpots: ->
+    @get('redeemers').length
 
   userHasRedeemed: (userID) ->
     for redeemer in @get('redeemers')
