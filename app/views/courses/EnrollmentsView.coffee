@@ -1,6 +1,7 @@
 RootView = require 'views/core/RootView'
 Classrooms = require 'collections/Classrooms'
 State = require 'models/State'
+User = require 'models/User'
 Prepaids = require 'collections/Prepaids'
 template = require 'templates/courses/enrollments-view'
 Users = require 'collections/Users'
@@ -61,7 +62,12 @@ module.exports = class EnrollmentsView extends RootView
     @listenToOnce @classrooms, 'sync', @onceClassroomsSync
     @supermodel.trackRequest @classrooms.fetchMine()
     @prepaids = new Prepaids()
-    @supermodel.trackRequest @prepaids.fetchByCreator(me.id)
+    @supermodel.trackRequest @prepaids.fetchMineAndShared(me.id)
+    @listenTo @prepaids, 'sync', ->
+      @prepaids.each (prepaid) =>
+        prepaid.creator = new User()
+        if prepaid.get('creator') isnt me.id
+          @supermodel.trackRequest prepaid.creator.fetchCreatorOfPrepaid(prepaid)
     @debouncedRender = _.debounce @render, 0
     @listenTo @prepaids, 'sync', @updatePrepaidGroups
     @listenTo(@state, 'all', @debouncedRender)

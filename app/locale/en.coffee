@@ -1606,7 +1606,8 @@
     refresh_to_update: "(refresh the page to see updates)"
   
   share_licenses:
-    share_licenses: "Share Licenses"
+    share_licenses: "share licenses"
+    shared_by: "Shared by:"
     add_teacher_label: "Add a teacher:"
     add_teacher_button: "Add Teacher"
     subheader: "You can make your licenses available to other teachers in your organization. Each license can only be used for one student at a time."

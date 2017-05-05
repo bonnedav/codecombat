@@ -176,6 +176,14 @@ module.exports =
       _id: { $gt: cutoffID }
       creator: mongoose.Types.ObjectId(creator)
     }
+    if req.query.includeShared
+      q = {
+        _id: { $gt: cutoffID }
+        $or: [
+          { creator: mongoose.Types.ObjectId(creator) }
+          { "joiners.userID": mongoose.Types.ObjectId(creator) }
+        ]
+      }
     q.type = { $in: ['course', 'starter_license'] } unless req.query.allTypes
 
     prepaids = yield Prepaid.find(q)

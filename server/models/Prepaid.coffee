@@ -11,6 +11,7 @@ PrepaidSchema = new mongoose.Schema {
 }, {strict: false, minimize: false,read:config.mongo.readpref}
 PrepaidSchema.index({code: 1}, { unique: true })
 PrepaidSchema.index({'redeemers.userID': 1})
+PrepaidSchema.index({'joiners.userID': 1}, {sparse: true})
 PrepaidSchema.index({owner: 1, endDate: 1}, { sparse: true })
 
 PrepaidSchema.statics.DEFAULT_START_DATE = new Date(2016,4,15).toISOString()
