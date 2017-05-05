@@ -1,3 +1,5 @@
+# This is the generic view for rendering content from /app/assets/markdown
+
 RootView = require 'views/core/RootView'
 utils = require 'core/utils'
 ace = require 'ace'
@@ -5,6 +7,10 @@ ace = require 'ace'
 module.exports = class MarkdownResourceView extends RootView
   id: 'markdown-resource-view'
   template: require 'templates/teachers/markdown-resource-view'
+  
+  events:
+    'click a': 'onClickAnchor'
+  
   initialize: (options, @name) ->
     super(options)
     @content = ''
@@ -22,7 +28,14 @@ module.exports = class MarkdownResourceView extends RootView
         $('body').append($("<img src='https://code.org/api/hour/begin_code_combat_teacher.png' style='visibility: hidden;'>"))
       @loadingData = false
       @render()
-
+  
+  onClickAnchor: (e)->
+    url = e.currentTarget.href
+    if url.split('#')[0] is location.href.split('#')[0]
+      @jump(url)
+    
+  jump: (url) ->
+    location.href = url
 
   afterRender: ->
     super()
@@ -40,3 +53,5 @@ module.exports = class MarkdownResourceView extends RootView
       aceEditor.setBehavioursEnabled false
       aceEditor.setAnimatedScroll false
       aceEditor.$blockScrolling = Infinity
+    if _.contains(location.href, '#')
+      @jump(location.href)

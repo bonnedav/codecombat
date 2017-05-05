@@ -26,6 +26,7 @@
 * [Is there a limit to how many students I can add in Introduction to Computer Science?](#is-there-a-limit-to-how-many-students-i-can-add-in-introduction-to-computer-science-)
 * [How do I reset my student's password?](#how-do-i-reset-my-student-s-password-)
 * [How do I transfer a license from one student to another?](#how-do-i-transfer-a-license-from-one-student-to-another-)
+* [How do I share licenses to other teachers in my organization?](#how-do-I-share-licenses-to-other-teachers-in-my-organization-)
 
 
 ### What is CodeCombat?
