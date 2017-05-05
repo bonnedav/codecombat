@@ -16,6 +16,7 @@ Promise.promisifyAll(StripeUtils)
 moment = require 'moment'
 slack = require '../slack'
 delighted = require '../delighted'
+sendwithus = require '../sendwithus'
 
 { STARTER_LICENSE_COURSE_IDS } = require '../../app/core/constants'
 {formatDollarValue} = require '../../app/core/utils'
@@ -147,6 +148,18 @@ module.exports =
     if result.nModified is 0
       @logError(req.user, "POST prepaid redeemer lost race on maxRedeemers")
       throw new errors.UnprocessableEntity('User was not enrolled with this set of enrollments (race)')
+    
+    
+    context =
+      email_id: sendwithus.templates.share_licenses_joiner
+      recipient:
+        address: joiner.get('email')
+        name: joiner.broadName()
+      email_data:
+        joiner_email: joiner.get('email')
+        creator_email: req.user.get('email')
+        creator_name: req.user.broadName()
+    sendwithus.api.send context, (err, result) ->
     
     res.status(200).send()
   
