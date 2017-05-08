@@ -31,7 +31,6 @@ ShareLicensesComponent = Vue.extend
   name: 'share-licenses-component'
   template: require('templates/teachers/share-licenses-component')()
   storeModule: ShareLicensesStoreModule
-  created: ->
   data: ->
     me: me
     teacherSearchInput: 'phoenix+teacher5a@codecombat.com'#nocommit

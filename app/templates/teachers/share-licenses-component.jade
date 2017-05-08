@@ -18,6 +18,10 @@
     .col-xs-8
       p.error-message.small
         {{ error }}
+        =" "
+        a(href='/teachers/resources/faq#how-do-i-share-licenses-to-other-teachers-in-my-organization-')
+          span
+            {{ $t("share_licenses.more_info") }}
   
   h4.m-t-5
     {{ $t("share_licenses.teachers_using_these") }}

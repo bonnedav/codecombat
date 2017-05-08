@@ -1618,6 +1618,7 @@
     you: "(you)"
     one_license_used: "(1 license used)"
     licenses_used: "(__licensesUsed__ licenses used)"
+    more_info: "More info"
 
   sharing:
     game: "Game"

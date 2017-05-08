@@ -445,22 +445,3 @@ module.exports =
       })
     ]
     return res.send(200)
-  
-  # TODO: Does this go in users or prepaids middleware?
-  fetchCreatorOfPrepaid: wrap (req, res) ->
-    console.log "Fetching owner"
-    unless req.user
-      throw new errors.Unauthorized()
-    unless req.user.isAdmin() or req.user.isTeacher()
-      throw new errors.Forbidden()
-    prepaid = yield database.getDocFromHandle(req, Prepaid)
-    unless prepaid
-      throw new errors.NotFound('No prepaid with that ID found')
-    unless _.find(prepaid.get('joiners'), {userID: req.user._id})
-      throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
-    console.log typeof prepaid.get('creator')
-    creator = yield User.findOne({ _id: prepaid.get('creator') })
-    console.log creator
-    res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))
-    res.status(500).send()
-    

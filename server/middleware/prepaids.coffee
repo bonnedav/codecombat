@@ -163,6 +163,23 @@ module.exports =
     
     res.status(200).send()
   
+  fetchCreator: wrap (req, res) ->
+    console.log "Fetching owner"
+    unless req.user
+      throw new errors.Unauthorized()
+    unless req.user.isAdmin() or req.user.isTeacher()
+      throw new errors.Forbidden()
+    prepaid = yield database.getDocFromHandle(req, Prepaid)
+    unless prepaid
+      throw new errors.NotFound('No prepaid with that ID found')
+    unless _.find(prepaid.get('joiners'), {userID: req.user._id})
+      throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
+    console.log typeof prepaid.get('creator')
+    creator = yield User.findOne({ _id: prepaid.get('creator') })
+    console.log creator
+    res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))
+    res.status(500).send()
+  
   fetchByCreator: wrap (req, res, next) ->
     creator = req.query.creator
     return next() if not creator
