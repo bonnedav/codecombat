@@ -5,10 +5,20 @@ initialState = {
   error: ''
 }
 
-module.exports = ShareLicensesStoreModule = {
+translateError = (message) ->
+  if /You've already shared these licenses with that teacher/.test(message)
+    return i18n.t('share_licenses.already_shared')
+  else if /No user with that email/.test(message)
+    return i18n.t('share_licenses.teacher_not_found')
+  else if /Teacher Accounts can only look up other Teacher Accounts/.test(message)
+    return i18n.t('share_licenses.teacher_not_valid')
+  else
+    return message
+
+module.exports = ShareLicensesStoreModule =
   namespaced: true
   state: _.cloneDeep(initialState)
-  mutations: {
+  mutations:
     # NOTE: Ideally, this store should fetch the prepaid, but we're already handed it by the Backbone parent
     setPrepaid: (state, prepaid) ->
       state._prepaid = prepaid
@@ -22,8 +32,7 @@ module.exports = ShareLicensesStoreModule = {
       state.error = error
     clearData: (state) ->
       _.assign state, initialState
-  }
-  actions: {
+  actions:
     setPrepaid: ({ commit }, prepaid) ->
       prepaid = _.cloneDeep(prepaid)
       prepaid.joiners ?= []
@@ -40,15 +49,11 @@ module.exports = ShareLicensesStoreModule = {
         $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
           commit('addTeacher', user)
         , (e) ->
-          commit('setError', e.responseJSON?.message)
-          console.log e.responseJSON?.message
+          commit('setError', translateError(e.responseJSON?.message))
       , (e) ->
-        commit('setError', e.responseJSON?.message)
-        console.log e.responseJSON?.message
-      # TODO: Translate error messages
+        commit('setError', translateError(e.responseJSON?.message))
       null
-  }
-  getters: {
+  getters:
     prepaid: (state) ->
       _.assign({}, state._prepaid, {
         joiners: state._prepaid.joiners.map (joiner) ->
@@ -58,7 +63,3 @@ module.exports = ShareLicensesStoreModule = {
             )[true] or 0
       })
     error: (state) -> state.error
-  }
-}
-
-module.exports = ShareLicensesStoreModule
