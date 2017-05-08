@@ -33,7 +33,7 @@ ShareLicensesComponent = Vue.extend
   storeModule: ShareLicensesStoreModule
   data: ->
     me: me
-    teacherSearchInput: 'phoenix+teacher5a@codecombat.com'#nocommit
+    teacherSearchInput: ''
   computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid', error: 'shareLicenses/error'))
   watch:
     teacherSearchInput: ->

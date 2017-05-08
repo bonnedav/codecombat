@@ -9,7 +9,7 @@ module.exports = ShareLicensesJoinerRow =
   props:
     joiner:
       type: Object
-      default: -> {name: 'phoenix', email: 'phoenix+teacher3@codecombat.com'}
+      default: -> {}
     prepaid:
       type: Object
       default: ->
