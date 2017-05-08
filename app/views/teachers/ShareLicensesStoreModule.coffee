@@ -45,13 +45,14 @@ module.exports = ShareLicensesStoreModule =
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
       # TODO: Use API for this instead
-      $.get('/db/user', { email }).then (user) =>
-        $.post("/db/prepaid/#{state._prepaid._id}/joiners", {userID: user._id}).then =>
+      api.users.getByEmail(email).then (user) =>
+        console.log "Got a user:", user
+        api.prepaids.addJoiner({prepaidID: state._prepaid._id, userID: user._id}).then =>
+          console.log "Added a joiner!"
           commit('addTeacher', user)
-        , (e) ->
-          commit('setError', translateError(e.responseJSON?.message))
-      , (e) ->
-        commit('setError', translateError(e.responseJSON?.message))
+      .catch (error) =>
+        console.log error
+        commit('setError', translateError(error.responseJSON?.message or error.message or error))
       null
   getters:
     prepaid: (state) ->
