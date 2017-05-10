@@ -172,7 +172,7 @@ module.exports =
     prepaid = yield database.getDocFromHandle(req, Prepaid)
     unless prepaid
       throw new errors.NotFound('No prepaid with that ID found')
-    unless _.find(prepaid.get('joiners'), {userID: req.user._id})
+    unless prepaid.canBeUsedBy(req.user._id)
       throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
     creator = yield User.findOne({ _id: prepaid.get('creator') })
     res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))

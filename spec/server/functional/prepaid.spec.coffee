@@ -84,6 +84,48 @@ describe 'GET /db/prepaid', ->
       expect(body.length).toEqual(4)
       done()
 
+describe 'GET /db/prepaid/:handle/creator', ->
+  beforeEach utils.wrap (done) ->
+    yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
+    @creator = yield utils.initUser({role: 'teacher'})
+    @joiner = yield utils.initUser({role: 'teacher'})
+    @admin = yield utils.initAdmin()
+    yield utils.loginUser(@admin)
+    @prepaid = yield utils.makePrepaid({ creator: @creator.id })
+    yield utils.loginUser(@creator)
+    yield utils.addJoinerToPrepaid(@prepaid, @joiner)
+    @url = getURL("/db/prepaid/#{@prepaid.id}/creator")
+    done()
+
+  describe 'when user is the creator', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.loginUser(@creator)
+      done()
+
+    it 'returns only course and starter_license prepaids for creator', utils.wrap (done) ->
+      [res, body] = yield request.getAsync({url: @url, json: true})
+      expect(res.statusCode).toBe(200)
+      console.log {body}
+      expect(body.email).toEqual(@creator.email)
+      expect(body.name).toEqual(@creator.name)
+      expect(body.firstName).toEqual(@creator.firstName)
+      expect(body.lastName).toEqual(@creator.lastName)
+      done()
+
+  describe 'when user is a joiner', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.loginUser(@joiner)
+      done()
+      
+    it 'returns only course and starter_license prepaids for creator', utils.wrap (done) ->
+      [res, body] = yield request.getAsync({url: @url, json: true})
+      expect(res.statusCode).toBe(200)
+      expect(body.email).toEqual(@creator.email)
+      expect(body.name).toEqual(@creator.name)
+      expect(body.firstName).toEqual(@creator.firstName)
+      expect(body.lastName).toEqual(@creator.lastName)
+      done()
+
 describe 'GET /db/prepaid/:handle', ->
   it 'populates startDate and endDate with default values', utils.wrap (done) ->
     prepaid = new Prepaid({type: 'course' })
