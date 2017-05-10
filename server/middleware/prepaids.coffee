@@ -161,7 +161,7 @@ module.exports =
         creator_name: req.user.broadName()
     sendwithus.api.send context, (err, result) ->
     
-    res.status(200).send()
+    res.status(201).send(prepaid.toObject({req}))
   
   fetchCreator: wrap (req, res) ->
     console.log "Fetching owner"

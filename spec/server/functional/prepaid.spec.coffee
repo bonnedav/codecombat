@@ -251,6 +251,34 @@ describe 'POST /db/prepaid/:handle/redeemers', ->
     expect(student.get('coursePrepaid')?.type).toEqual('starter_license')
     done()
 
+  describe 'when user is a joiner on a shared license', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
+      @creator = yield utils.initUser({role: 'teacher'})
+      @joiner = yield utils.initUser({role: 'teacher'})
+      @admin = yield utils.initAdmin()
+      yield utils.loginUser(@admin)
+      @prepaid = yield utils.makePrepaid({ creator: @creator.id })
+      yield utils.loginUser(@creator)
+      yield utils.addJoinerToPrepaid(@prepaid, @joiner)
+      yield utils.loginUser(@joiner)
+      @student = yield utils.initUser()
+      @url = getURL("/db/prepaid/#{@prepaid.id}/redeemers")
+      done()
+    
+    it 'allows teachers with shared licenses to redeem', utils.wrap (done) ->
+      prepaid = yield Prepaid.findById(@prepaid.id)
+      expect(prepaid.get('redeemers').length).toBe(0)
+      [res, body] = yield request.postAsync {uri: @url, json: { userID: @student.id } }
+      expect(body.redeemers.length).toBe(1)
+      expect(res.statusCode).toBe(201)
+      prepaid = yield Prepaid.findById(body._id)
+      expect(prepaid.get('redeemers').length).toBe(1)
+      @student = yield User.findById(@student.id)
+      expect(@student.get('coursePrepaid')._id.equals(@prepaid._id)).toBe(true)
+      expect(@student.get('role')).toBe('student')
+      done()
+
 describe 'DELETE /db/prepaid/:handle/redeemers', ->
 
   beforeEach utils.wrap (done) ->
@@ -312,14 +340,64 @@ describe 'DELETE /db/prepaid/:handle/redeemers', ->
     [res, body] = yield request.delAsync {uri: @url, json: { userID: @student.id } }
     expect(res.statusCode).toBe(403)
 
+  describe 'when user is a joiner on a shared license', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
+      @creator = yield utils.initUser({role: 'teacher'})
+      @joiner = yield utils.initUser({role: 'teacher'})
+      @admin = yield utils.initAdmin()
+      yield utils.loginUser(@admin)
+      @prepaid = yield utils.makePrepaid({ creator: @creator.id })
+      yield utils.loginUser(@creator)
+      yield utils.addJoinerToPrepaid(@prepaid, @joiner)
+      yield utils.loginUser(@joiner)
+      @student = yield utils.initUser()
+      @url = getURL("/db/prepaid/#{@prepaid.id}/redeemers")
+      [res, body] = yield request.postAsync {uri: @url, json: { userID: @student.id } }
+      expect(res.statusCode).toBe(201)
+      done()
+
+    it 'allows teachers with shared licenses to revoke', utils.wrap (done) ->
+      prepaid = yield Prepaid.findById(@prepaid.id)
+      expect(prepaid.get('redeemers').length).toBe(1)
+      [res, body] = yield request.delAsync {uri: @url, json: { userID: @student.id } }
+      expect(body.redeemers.length).toBe(0)
+      expect(res.statusCode).toBe(200)
+      prepaid = yield Prepaid.findById(body._id)
+      expect(prepaid.get('redeemers').length).toBe(0)
+      student = yield User.findById(@student.id)
+      expect(student.get('coursePrepaid')).toBeUndefined()
+      done()
+
+describe 'POST /db/prepaid/:handle/joiners', ->
+
+  beforeEach utils.wrap (done) ->
+    yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
+    @teacher = yield utils.initUser({role: 'teacher'})
+    @admin = yield utils.initAdmin()
+    yield utils.loginUser(@admin)
+    @prepaid = yield utils.makePrepaid({ creator: @teacher.id })
+    yield utils.loginUser(@teacher)
+    @joiner = yield utils.initUser({role: 'teacher'})
+    @url = getURL("/db/prepaid/#{@prepaid.id}/joiners")
+    done()
+
+  it 'adds a given user to the joiners property', utils.wrap (done) ->
+    [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
+    expect(res.statusCode).toBe(201)
+    prepaid = yield Prepaid.findById(body._id)
+    expect(prepaid.get('joiners').length).toBe(1)
+    expect(prepaid.get('joiners')[0].userID + '').toBe(@joiner.id)
+    done()
+
 describe 'GET /db/prepaid?creator=:id', ->
   beforeEach utils.wrap (done) ->
     yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
     @teacher = yield utils.initUser({role: 'teacher'})
-    admin = yield utils.initAdmin()
-    yield utils.loginUser(admin)
+    @admin = yield utils.initAdmin()
+    yield utils.loginUser(@admin)
     @prepaid = yield utils.makePrepaid({ creator: @teacher.id })
-    @otherPrepaid = yield utils.makePrepaid({ creator: admin.id })
+    @otherPrepaid = yield utils.makePrepaid({ creator: @admin.id })
     @expiredPrepaid = yield utils.makePrepaid({ creator: @teacher.id, endDate: moment().subtract(1, 'month').toISOString() })
     @unmigratedPrepaid = yield utils.makePrepaid({ creator: @teacher.id })
     yield @unmigratedPrepaid.update({$unset: { endDate: '', startDate: '' }})
@@ -346,6 +424,27 @@ describe 'GET /db/prepaid?creator=:id', ->
     expect(res.statusCode).toBe(403)
     done()
 
+  describe 'when includeShared is set to true', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.loginUser(@admin)
+      @joiner = yield utils.initUser({role: 'teacher'})
+      @joinersPrepaid = yield utils.makePrepaid({ creator: @joiner.id })
+      yield @prepaid.update({$set: { joiners: { userID: @joiner._id }}})
+      yield utils.loginUser(@joiner)
+      done()
+
+    it 'returns licenses that have been shared with the user', utils.wrap (done) ->
+      url = getURL("/db/prepaid?creator=#{@joiner.id}&includeShared=true")
+      [res, body] = yield request.getAsync({uri: url, json: true})
+      expect(res.statusCode).toBe(200)
+      expect(res.body.length).toEqual(2)
+      if _.any((prepaid._id is @otherPrepaid.id for prepaid in res.body))
+        fail('Found the admin prepaid in response')
+      for prepaid in res.body
+        unless prepaid.startDate and prepaid.endDate
+          fail('All prepaids should have start and end dates')
+      expect(res.body[0]._id).toBe(@prepaid.id)
+      done()
 
 describe '/db/prepaid', ->
   beforeEach utils.wrap (done) ->
