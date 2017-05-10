@@ -61,7 +61,7 @@ module.exports =
     if not user
       throw new errors.NotFound('User not found.')
 
-    unless prepaid.get('creator').equals(req.user._id)
+    unless prepaid.canBeUsedBy(req.user._id)
       throw new errors.Forbidden('You may not redeem licenses from this prepaid')
     unless prepaid.get('type') in ['course', 'starter_license']
       throw new errors.Forbidden('This prepaid is not of type "course" or "starter_license"')
@@ -85,7 +85,7 @@ module.exports =
     if not prepaid
       throw new errors.NotFound('Prepaid not found.')
 
-    unless prepaid.get('creator').equals(req.user._id)
+    unless prepaid.canBeUsedBy(req.user._id)
       throw new errors.Forbidden('You may not revoke enrollments you do not own.')
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
@@ -174,9 +174,7 @@ module.exports =
       throw new errors.NotFound('No prepaid with that ID found')
     unless _.find(prepaid.get('joiners'), {userID: req.user._id})
       throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
-    console.log typeof prepaid.get('creator')
     creator = yield User.findOne({ _id: prepaid.get('creator') })
-    console.log creator
     res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))
     res.status(500).send()
   
@@ -217,6 +215,7 @@ module.exports =
     prepaids = yield Prepaid.find(query, {creator: 1, startDate: 1, endDate: 1, maxRedeemers: 1, redeemers: 1}).lean()
     console.log new Date().toISOString(), 'prepaids', prepaids.length
     teacherIds = []
+    # NOTE: May not correctly account for shared licenses
     teacherIds.push(prepaid.creator) for prepaid in prepaids
     teachers = yield User.find({_id: {$in: teacherIds}}, {_id: 1, permissions: 1, name: 1, emailLower: 1}).lean()
     adminMap = {}
