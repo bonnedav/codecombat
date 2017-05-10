@@ -45,7 +45,7 @@ PrepaidSchema.methods.canReplaceUserPrepaid = (otherPrepaid) ->
   return false
 
 PrepaidSchema.methods.canBeUsedBy = (userID) ->
-  @get('creator').equals(userID) or _.find(@get('joiners'), {userID})
+  @get('creator').equals(userID) or _.find(@get('joiners'), (joiner) -> joiner.userID.equals(userID) )
 
 PrepaidSchema.pre('save', (next) ->
   @set('exhausted', @get('maxRedeemers') <= _.size(@get('redeemers')))

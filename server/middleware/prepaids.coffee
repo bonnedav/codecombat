@@ -176,7 +176,6 @@ module.exports =
       throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
     creator = yield User.findOne({ _id: prepaid.get('creator') })
     res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))
-    res.status(500).send()
   
   fetchByCreator: wrap (req, res, next) ->
     creator = req.query.creator
