@@ -285,6 +285,7 @@ module.exports =
       continue unless prepaid.creator
       userPrepaidsMap[prepaid.creator.valueOf()] ?= []
       userPrepaidsMap[prepaid.creator.valueOf()].push(prepaid)
+      # NOTE: May not correctly account for shared licenses
       userIDs.push prepaid.creator
       for redeemer in prepaid.redeemers ? []
         redeemerIDs.push redeemer.userID + ""
