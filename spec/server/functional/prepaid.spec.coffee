@@ -105,7 +105,6 @@ describe 'GET /db/prepaid/:handle/creator', ->
     it 'returns only course and starter_license prepaids for creator', utils.wrap (done) ->
       [res, body] = yield request.getAsync({url: @url, json: true})
       expect(res.statusCode).toBe(200)
-      console.log {body}
       expect(body.email).toEqual(@creator.email)
       expect(body.name).toEqual(@creator.name)
       expect(body.firstName).toEqual(@creator.firstName)
@@ -124,6 +123,35 @@ describe 'GET /db/prepaid/:handle/creator', ->
       expect(body.name).toEqual(@creator.name)
       expect(body.firstName).toEqual(@creator.firstName)
       expect(body.lastName).toEqual(@creator.lastName)
+      done()
+      
+describe 'GET /db/prepaid/:handle/joiners', ->
+  beforeEach utils.wrap (done) ->
+    yield utils.clearModels([Course, CourseInstance, Payment, Prepaid, User])
+    @creator = yield utils.initUser({role: 'teacher'})
+    @joiner = yield utils.initUser({role: 'teacher', firstName: 'joiner', lastName: 'one'})
+    @joiner2 = yield utils.initUser({role: 'teacher', firstName: 'joiner', lastName: 'two'})
+    @admin = yield utils.initAdmin()
+    yield utils.loginUser(@admin)
+    @prepaid = yield utils.makePrepaid({ creator: @creator.id })
+    yield utils.loginUser(@creator)
+    yield utils.addJoinerToPrepaid(@prepaid, @joiner)
+    yield utils.addJoinerToPrepaid(@prepaid, @joiner2)
+    @url = getURL("/db/prepaid/#{@prepaid.id}/joiners")
+    done()
+
+  describe 'when user is the creator', ->
+    beforeEach utils.wrap (done) ->
+      yield utils.loginUser(@creator)
+      done()
+
+    it 'returns an array of users', utils.wrap (done) ->
+      [res, body] = yield request.getAsync({url: @url, json: true})
+      expect(res.statusCode).toBe(200)
+      expect(body.length).toBe(2)
+      expect(body[0]._id).toEqual(@joiner._id+'')
+      expect(_.omit(body[0], '_id')).toEqual(_.pick(@joiner.toObject(), 'name', 'email', 'firstName', 'lastName'))
+      expect(_.omit(body[1], '_id')).toEqual(_.pick(@joiner2.toObject(), 'name', 'email', 'firstName', 'lastName'))
       done()
 
 describe 'GET /db/prepaid/:handle', ->

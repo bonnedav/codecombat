@@ -185,7 +185,6 @@ module.exports =
     res.status(200).send(joiners)
   
   fetchCreator: wrap (req, res) ->
-    console.log "Fetching owner"
     unless req.user
       throw new errors.Unauthorized()
     unless req.user.isAdmin() or req.user.isTeacher()
