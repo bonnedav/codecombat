@@ -92,7 +92,7 @@ mixin prepaidCard(prepaid, className)
     else
       div(data-i18n="teacher.licenses_remaining")
     div.m-t-1
-      i
+      i.small-details
         if prepaid.usedSpots() === 1
           = translate('teacher.one_license_used')
         else

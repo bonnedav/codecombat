@@ -1606,8 +1606,8 @@
     refresh_to_update: "(refresh the page to see updates)"
   
   share_licenses:
-    share_licenses: "share licenses"
-    shared_by: "Shared by:"
+    share_licenses: "Share Licenses"
+    shared_by: "Shared By:"
     add_teacher_label: "Add a teacher:"
     add_teacher_button: "Add Teacher"
     subheader: "You can make your licenses available to other teachers in your organization. Each license can only be used for one student at a time."
@@ -2264,5 +2264,3 @@
     fx_missing_paren: "If you want to call `$1` as function, you need `()`'s"
     unmatched_token: "Unmatched `$1`.  Every opening `$2` needs a closing `$3` to match it."
     unterminated_string: "Unterminated string. Add a matching `\"` at the end of your string."
-
-  
