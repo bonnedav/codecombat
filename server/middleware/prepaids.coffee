@@ -163,6 +163,28 @@ module.exports =
     
     res.status(201).send(prepaid.toObject({req}))
   
+  fetchJoiners: wrap (req, res) ->
+    if not req.user?.isTeacher()
+      throw new errors.Forbidden('Must be a teacher to share licenses')
+  
+    prepaid = yield database.getDocFromHandle(req, Prepaid)
+    if not prepaid
+      throw new errors.NotFound('Prepaid not found.')
+  
+    unless prepaid.get('creator').equals(req.user._id)
+      throw new errors.Forbidden('You may not share licenses you do not own.')
+    unless prepaid.get('type') is 'course'
+      throw new errors.Forbidden('This prepaid is not of type "course".')
+  
+    joinerIDs = prepaid.get('joiners').map((j)->j.userID)
+  
+    joiners = (yield joinerIDs.map (id) ->
+      User.findById(id)
+    ).map (user) ->
+      _.pick(user.toObject(), ['_id', 'email', 'name', 'firstName', 'lastName'])
+    
+    res.status(200).send(joiners)
+  
   fetchCreator: wrap (req, res) ->
     console.log "Fetching owner"
     unless req.user
@@ -175,7 +197,7 @@ module.exports =
     unless prepaid.canBeUsedBy(req.user._id)
       throw new errors.Forbidden('You can only look up the owner of prepaids that have been shared with you.')
     creator = yield User.findOne({ _id: prepaid.get('creator') })
-    res.status(200).send(_.pick(creator.toObject(), ['email', 'name', 'firstName', 'lastName']))
+    res.status(200).send(_.pick(creator.toObject(), ['_id', 'email', 'name', 'firstName', 'lastName']))
   
   fetchByCreator: wrap (req, res, next) ->
     creator = req.query.creator

@@ -8,4 +8,7 @@ module.exports = {
       method: 'POST'
       json: { userID }
     })
+
+  fetchJoiners: ({ prepaidID }, options={}) ->
+    fetchJson(@url(prepaidID, 'joiners'))
 }

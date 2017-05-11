@@ -23,7 +23,6 @@ module.exports = class ShareLicensesModal extends ModalView
         store
       })
   destroy: ->
-    console.log "destroy"
     @shareLicensesComponent.$destroy()
     super(arguments...)
 
@@ -45,6 +44,5 @@ ShareLicensesComponent = Vue.extend
       @$store.dispatch('shareLicenses/addTeacher', @teacherSearchInput)
   created: ->
   destroyed: ->
-    console.log "destroyed"
     @$store.commit('shareLicenses/clearData')
     @$store.unregisterModule('shareLicenses')

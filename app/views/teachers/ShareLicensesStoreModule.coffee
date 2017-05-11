@@ -36,11 +36,11 @@ module.exports = ShareLicensesStoreModule =
     setPrepaid: ({ commit }, prepaid) ->
       prepaid = _.cloneDeep(prepaid)
       prepaid.joiners ?= []
-      userRequests = prepaid.joiners.map (joiner) ->
-        console.log "Requesting user for", joiner.userID
-        api.users.getByHandle(joiner.userID).then (user) ->
-          _.assign(joiner, _.pick(user, 'name', 'firstName', 'lastName', 'email'))
-      Promise.all(userRequests).then ->
+      api.prepaids.fetchJoiners({ prepaidID: prepaid._id }).then (joiners) ->
+        prepaid.joiners.forEach (slimJoiner) ->
+          fullJoiner = _.find(joiners, {_id: slimJoiner.userID})
+          _.assign(slimJoiner, fullJoiner)
+      .then ->
         prepaid.joiners.push(_.assign({ userID: me.id }, me.pick('name', 'firstName', 'lastName', 'email')))
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
@@ -57,10 +57,11 @@ module.exports = ShareLicensesStoreModule =
   getters:
     prepaid: (state) ->
       _.assign({}, state._prepaid, {
-        joiners: state._prepaid.joiners.map (joiner) ->
+        joiners: state._prepaid.joiners.map((joiner) ->
           _.assign {}, joiner,
             licensesUsed: _.countBy(state._prepaid.redeemers, (redeemer) ->
               (not redeemer.teacherID and joiner.userID is me.id) or (redeemer.teacherID is joiner.userID)
             )[true] or 0
+        ).reverse()
       })
     error: (state) -> state.error
