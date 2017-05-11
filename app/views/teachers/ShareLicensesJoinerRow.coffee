@@ -19,7 +19,6 @@ module.exports = ShareLicensesJoinerRow =
     me: me
   computed:
     broadName: ->
-      console.log new User(@joiner)
       (new User(@joiner)).broadName()
   components: {}
   methods:

@@ -27,6 +27,8 @@ module.exports = ShareLicensesStoreModule =
         userID: user._id
         name: user.name
         email: user.email
+        firstName: user.firstName
+        lastName: user.lastName
       })
     setError: (state, error) ->
       state.error = error
@@ -44,16 +46,12 @@ module.exports = ShareLicensesStoreModule =
         prepaid.joiners.push(_.assign({ userID: me.id }, me.pick('name', 'firstName', 'lastName', 'email')))
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
-      # TODO: Use API for this instead
       api.users.getByEmail(email).then (user) =>
-        console.log "Got a user:", user
         api.prepaids.addJoiner({prepaidID: state._prepaid._id, userID: user._id}).then =>
-          console.log "Added a joiner!"
           commit('addTeacher', user)
       .catch (error) =>
         console.log error
         commit('setError', translateError(error.responseJSON?.message or error.message or error))
-      null
   getters:
     prepaid: (state) ->
       _.assign({}, state._prepaid, {
