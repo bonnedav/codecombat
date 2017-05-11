@@ -131,7 +131,7 @@ module.exports =
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
 
-    if _.find(prepaid.get('joiners'), {userID: mongoose.Types.ObjectId(req.body?.userID)}) or req.body?.userID is req.user.id
+    if _.find(prepaid.get('joiners'), (joiner) -> joiner.userID.equals(req.body?.userID)) or req.body?.userID is req.user.id
       throw new errors.UnprocessableEntity("You've already shared these licenses with that teacher.")
 
     joiner = yield User.findById(req.body?.userID)
@@ -148,7 +148,6 @@ module.exports =
     if result.nModified is 0
       @logError(req.user, "POST prepaid redeemer lost race on maxRedeemers")
       throw new errors.UnprocessableEntity('User was not enrolled with this set of enrollments (race)')
-    
     
     context =
       email_id: sendwithus.templates.share_licenses_joiner
