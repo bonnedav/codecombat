@@ -113,17 +113,8 @@ mixin prepaidCard(prepaid, className)
     else if !prepaid.creator.loading
       span(data-i18n="share_licenses.shared_by")
       = " "
-      span= prepaid.creator.broadName()
-      //- - debugger
-      br
-      | (
       a(href="mailto:" + prepaid.creator.get('email'))
-        = prepaid.creator.get('email').split('@')[0]
-        wbr
-        | @
-        = prepaid.creator.get('email').split('@')[1]
-      | )
-
+        span= prepaid.creator.broadName()
 
 mixin addCredits
   .text-center.m-b-3.m-t-3
