@@ -1608,7 +1608,7 @@
   share_licenses:
     share_licenses: "Share Licenses"
     shared_by: "Shared By:"
-    add_teacher_label: "Add a teacher:"
+    add_teacher_label: "Enter exact teacher email:"
     add_teacher_button: "Add Teacher"
     subheader: "You can make your licenses available to other teachers in your organization. Each license can only be used for one student at a time."
     teacher_not_found: "Teacher not found. Please make sure this teacher has already created a Teacher Account."
