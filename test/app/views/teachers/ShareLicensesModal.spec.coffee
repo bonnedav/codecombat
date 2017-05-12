@@ -18,10 +18,9 @@ describe 'ShareLicensesModal', ->
         ])
       @modal = new ShareLicensesModal({ prepaid: @prepaid.attributes })
       @modal.render()
-      # jasmine.demoModal(@modal)
+      @store = @modal.shareLicensesComponent.$store
       _.defer ->
         done()
-    
     
     it 'shows a list of joiners', ->
       expect(@modal.$el.html()).toContain('joiner one')
@@ -41,6 +40,8 @@ describe 'ShareLicensesModal', ->
       it 'can add a joiner', (done) ->
         @modal.shareLicensesComponent.teacherSearchInput = @joiner3.get('email')
         @modal.shareLicensesComponent.addTeacher().then =>
-          expect(@modal.$el.html()).toContain('joiner three')
-          expect(@modal.$el.html()).toContain(@joiner3.get('email'))
+          joiners = @modal.shareLicensesComponent.prepaid.joiners
+          expect(joiners[0].firstName).toBe('joiner')
+          expect(joiners[0].lastName).toBe('three')
+          expect(joiners[0].email).toBe(@joiner3.get('email'))
           done()
