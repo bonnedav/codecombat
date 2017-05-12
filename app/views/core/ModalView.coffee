@@ -47,7 +47,7 @@ module.exports = class ModalView extends CocoView
     # it doesn't just reopen the modal.
     $(document.activeElement).blur()
     
-    if not application.isProduction()
+    if localStorage?.showViewNames
       title = @constructor.name
       setTimeout ->
         $('title').text(title)
