@@ -12,7 +12,7 @@ module.exports = class Prepaid extends CocoModel
     @get('maxRedeemers')
   
   usedSpots: ->
-    @get('redeemers').length
+    _.size(@get('redeemers'))
 
   userHasRedeemed: (userID) ->
     for redeemer in @get('redeemers')
