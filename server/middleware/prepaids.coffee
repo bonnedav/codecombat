@@ -175,7 +175,7 @@ module.exports =
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
   
-    joinerIDs = prepaid.get('joiners').map((j)->j.userID)
+    joinerIDs = (prepaid.get('joiners') or []).map((j)->j.userID)
   
     joiners = (yield joinerIDs.map (id) ->
       User.findById(id)
