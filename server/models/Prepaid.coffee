@@ -65,7 +65,7 @@ PrepaidSchema.post 'init', (doc) ->
     if not @get('endDate')
       @set('endDate', Prepaid.DEFAULT_END_DATE)
       
-PrepaidSchema.methods.redeem = co.wrap (user) ->
+PrepaidSchema.methods.redeem = co.wrap (user, teacherID) ->
   if @get('endDate') and new Date(@get('endDate')) < new Date()
     throw new errors.Forbidden('This prepaid is expired')
   
@@ -89,7 +89,7 @@ PrepaidSchema.methods.redeem = co.wrap (user) ->
     if redeemer.userID.equals(user._id)
       throw new errors.Forbidden('User already redeemed')
 
-  newRedeemerPush = { $push: { redeemers : { date: new Date(), userID: user._id } }}
+  newRedeemerPush = { $push: { redeemers : { date: new Date(), userID: user._id, teacherID: teacherID } }}
   result = yield Prepaid.update(
     {
       _id: @_id,

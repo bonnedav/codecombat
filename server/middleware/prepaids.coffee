@@ -68,11 +68,11 @@ module.exports =
     unless prepaid.canReplaceUserPrepaid(user.get('coursePrepaid'))
       return res.status(200).send(prepaid.toObject({req: req}))
 
-    yield prepaid.redeem(user)
+    yield prepaid.redeem(user, req.user._id)
 
     # return prepaid with new redeemer added locally
     redeemers = _.clone(prepaid.get('redeemers') or [])
-    redeemers.push({ date: new Date(), userID: user._id })
+    redeemers.push({ date: new Date(), userID: user._id, teacherID: req.user._id })
     prepaid.set('redeemers', redeemers)
     res.status(201).send(prepaid.toObject({req: req}))
 

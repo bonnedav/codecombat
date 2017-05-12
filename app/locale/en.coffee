@@ -1445,6 +1445,7 @@
     changed: "Changed"
     available_credits: "Available Licenses"
     pending_credits: "Pending Licenses"
+    empty_credits: "Exhausted Licenses"
     license_remaining: "license remaining"
     licenses_remaining: "licenses remaining"
     one_license_used: "1 license has been used"
