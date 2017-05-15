@@ -11,8 +11,8 @@ module.exports = class ShareLicensesModal extends ModalView
   events: {}
   initialize: (options={}) ->
     @shareLicensesComponent = null
-    store.registerModule('shareLicenses', ShareLicensesStoreModule) #TODO: Do I use this or 'modal' namespace?
-    store.dispatch('shareLicenses/setPrepaid', options.prepaid)
+    store.registerModule('modal', ShareLicensesStoreModule)
+    store.dispatch('modal/setPrepaid', options.prepaid)
   afterRender: ->
     target = @$el.find('#share-licenses-component')
     if @shareLicensesComponent
@@ -33,16 +33,16 @@ ShareLicensesComponent = Vue.extend
   data: ->
     me: me
     teacherSearchInput: ''
-  computed: _.assign({}, Vuex.mapGetters(prepaid: 'shareLicenses/prepaid', error: 'shareLicenses/error'))
+  computed: _.assign({}, Vuex.mapGetters(prepaid: 'modal/prepaid', error: 'modal/error'))
   watch:
     teacherSearchInput: ->
-      @$store.commit('shareLicenses/setError', '')
+      @$store.commit('modal/setError', '')
   components:
     'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
   methods:
     addTeacher: ->
-      @$store.dispatch('shareLicenses/addTeacher', @teacherSearchInput)
+      @$store.dispatch('modal/addTeacher', @teacherSearchInput)
   created: ->
   destroyed: ->
-    @$store.commit('shareLicenses/clearData')
-    @$store.unregisterModule('shareLicenses')
+    @$store.commit('modal/clearData')
+    @$store.unregisterModule('modal')
