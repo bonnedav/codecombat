@@ -8,9 +8,6 @@ module.exports = class MarkdownResourceView extends RootView
   id: 'markdown-resource-view'
   template: require 'templates/teachers/markdown-resource-view'
   
-  events:
-    'click a': 'onClickAnchor'
-  
   initialize: (options, @name) ->
     super(options)
     @content = ''
@@ -29,14 +26,6 @@ module.exports = class MarkdownResourceView extends RootView
       @loadingData = false
       @render()
   
-  onClickAnchor: (e)->
-    url = e.currentTarget.href
-    if url.split('#')[0] is location.href.split('#')[0]
-      @jump(url)
-    
-  # Remind the browser of the fragment in the URL, so it jumps to the right section.
-  jump: (url) ->
-    location.href = url
 
   afterRender: ->
     super()
@@ -56,4 +45,5 @@ module.exports = class MarkdownResourceView extends RootView
       aceEditor.$blockScrolling = Infinity
     if _.contains(location.href, '#')
       _.defer =>
-        @jump(location.href)
+        # Remind the browser of the fragment in the URL, so it jumps to the right section.
+        location.href = location.href

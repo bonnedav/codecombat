@@ -144,6 +144,6 @@ If you have Full Licenses, you can share access to them with other teachers in y
 
 You can only add teachers in your organization that have already created a Teacher Account ([here's how](/teachers/resources/getting-started)). Once a teacher has been added to a shared license pool, they have the ability to use any of the licenses you've shared.
 
-When a license has been used, it is not available to be used by another teacher until that teacher revokes the license from the student (see [How to Transfer a License](/teachers/resources/faq#how-do-i-transfer-a-license-from-one-student-to-another-)).
+When a license has been used, it is not available to be used by another teacher until that teacher revokes the license from the student (see [How to Transfer a License](#how-do-i-transfer-a-license-from-one-student-to-another-)).
 
 [Back to Top](#frequently-asked-questions)
