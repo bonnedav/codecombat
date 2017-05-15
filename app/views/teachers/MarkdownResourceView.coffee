@@ -55,4 +55,5 @@ module.exports = class MarkdownResourceView extends RootView
       aceEditor.setAnimatedScroll false
       aceEditor.$blockScrolling = Infinity
     if _.contains(location.href, '#')
-      @jump(location.href)
+      _.defer =>
+        @jump(location.href)
