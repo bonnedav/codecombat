@@ -7,7 +7,7 @@ module.exports = {
     fetchJson("/db/user/#{handle}", options)
 
   getByEmail: (email, options={}) ->
-    _.merge options, { data: { email } }
+    _.merge {}, options, { data: { email } }
     fetchJson("/db/user", options)
 
   signupWithPassword: ({userId, name, email, password}, options={}) ->

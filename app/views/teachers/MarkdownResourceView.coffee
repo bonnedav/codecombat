@@ -34,6 +34,7 @@ module.exports = class MarkdownResourceView extends RootView
     if url.split('#')[0] is location.href.split('#')[0]
       @jump(url)
     
+  # Remind the browser of the fragment in the URL, so it jumps to the right section.
   jump: (url) ->
     location.href = url
 
