@@ -189,6 +189,18 @@ describe 'GET /db/prepaid/:handle/joiners', ->
       expect(_.omit(body[1], '_id')).toEqual(_.pick(@joiner2.toObject(), 'name', 'email', 'firstName', 'lastName'))
       done()
 
+  describe 'when user is not a teacher', ->
+    beforeEach utils.wrap (done) ->
+      @user = yield utils.initUser()
+      yield utils.loginUser(@user)
+      done()
+
+    it 'returns a Forbidden Error', utils.wrap (done) ->
+      [res, body] = yield request.getAsync({url: @url, json: true})
+      expect(res.statusCode).toBe(403)
+      expect(body.email).toBeUndefined()
+      done()
+
   describe 'when user is not the creator', ->
     beforeEach utils.wrap (done) ->
       yield utils.loginUser(@joiner)
@@ -536,11 +548,42 @@ describe 'POST /db/prepaid/:handle/joiners', ->
     expect(prepaid.get('joiners').length).toBe(1)
     expect(prepaid.get('joiners')[0].userID + '').toBe(@joiner.id)
     done()
+  
+  describe 'when a user has already been added to joiners', ->
+    it "doesn't add a user twice", utils.wrap (done) ->
+      [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
+      expect(res.statusCode).toBe(201)
+      [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
+      expect(res.statusCode).toBe(422)
+      expect(body.i18n).toBe('share_licenses.already_shared')
+      prepaid = yield Prepaid.findById(@prepaid.id)
+      expect(prepaid.get('joiners').length).toBe(1)
+      expect(prepaid.get('joiners')[0].userID + '').toBe(@joiner.id)
+      done()
 
   it 'returns 403 if user is not the creator', utils.wrap (done) ->
     yield utils.loginUser(@joiner)
     [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
     expect(res.statusCode).toBe(403)
+    done()
+
+  it 'returns 403 if user is not a teacher', utils.wrap (done) ->
+    @user = yield utils.initUser()
+    yield utils.loginUser(@user)
+    [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
+    expect(res.statusCode).toBe(403)
+    done()
+
+  it 'returns 422 if joiner is not a teacher', utils.wrap (done) ->
+    @nonteacher = yield utils.initUser()
+    [res, body] = yield request.postAsync {uri: @url, json: { userID: @nonteacher.id } }
+    expect(res.statusCode).toBe(422)
+    done()
+
+  it 'returns 404 if prepaid is not found', utils.wrap (done) ->
+    @url = getURL("/db/prepaid/#{@prepaid.id}a/joiners")
+    [res, body] = yield request.postAsync {uri: @url, json: { userID: @joiner.id } }
+    expect(res.statusCode).toBe(404)
     done()
 
 describe 'GET /db/prepaid?creator=:id', ->

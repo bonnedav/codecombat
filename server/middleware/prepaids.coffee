@@ -139,7 +139,7 @@ module.exports =
       throw new errors.NotFound('User not found.')
 
     if not joiner.isTeacher()
-      throw new errors.UnprocessableEntity('User to share with must be a Teacher.')
+      throw new errors.UnprocessableEntity('User to share with must be a Teacher.', { i181: 'share_licenses.teacher_not_valid' })
     
     query =
       _id: prepaid._id
