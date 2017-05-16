@@ -66,10 +66,9 @@ module.exports = class EnrollmentsView extends RootView
     @listenTo @prepaids, 'sync', ->
       @prepaids.each (prepaid) =>
         prepaid.creator = new User()
+        # We never need this information if the user would be `me`
         if prepaid.get('creator') isnt me.id
           @supermodel.trackRequest prepaid.creator.fetchCreatorOfPrepaid(prepaid)
-        else
-          prepaid.creator = me
     @debouncedRender = _.debounce @render, 0
     @listenTo @prepaids, 'sync', @updatePrepaidGroups
     @listenTo(@state, 'all', @debouncedRender)
