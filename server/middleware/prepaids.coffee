@@ -132,7 +132,7 @@ module.exports =
       throw new errors.Forbidden('This prepaid is not of type "course".')
 
     if _.find(prepaid.get('joiners'), (joiner) -> joiner.userID.equals(req.body?.userID)) or req.body?.userID is req.user.id
-      throw new errors.UnprocessableEntity("You've already shared these licenses with that teacher.")
+      throw new errors.UnprocessableEntity("You've already shared these licenses with that teacher.", { i18n: 'share_licenses.already_shared' })
 
     joiner = yield User.findById(req.body?.userID)
     if not joiner

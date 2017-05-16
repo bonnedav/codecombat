@@ -63,12 +63,12 @@ module.exports =
     return next() unless email
     if req.user?.isAdmin()
       user = yield User.findOne({ emailLower: email.toLowerCase() })
-      throw new errors.NotFound('No user with that email') unless user
+      throw new errors.NotFound('No user with that email', { errorID: 'no-user-with-that-email' }) unless user
       res.status(200).send(user.toObject({req}))
     else if req.user?.isTeacher()
       user = yield User.findOne({ emailLower: email.toLowerCase() })
-      throw new errors.NotFound('No user with that email') unless user
-      throw new errors.Forbidden('Teacher Accounts can only look up other Teacher Accounts.') unless user.isTeacher()
+      throw new errors.NotFound('No user with that email', { errorID: 'no-user-with-that-email' }) unless user
+      throw new errors.Forbidden('Teacher Accounts can only look up other Teacher Accounts.', { errorID: 'cant-fetch-nonteacher-by-email' }) unless user.isTeacher()
       trimUser = _.pick(user.toObject(), ['_id', 'email', 'firstName', 'lastName', 'name'])
       res.status(200).send(trimUser)
     else

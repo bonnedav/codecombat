@@ -5,15 +5,15 @@ initialState = {
   error: ''
 }
 
-translateError = (message) ->
-  if /You've already shared these licenses with that teacher/.test(message)
-    return i18n.t('share_licenses.already_shared')
-  else if /No user with that email/.test(message)
+translateError = (error) ->
+  if error.i18n
+    return i18n.t(error.i18n)
+  else if error.errorID is 'no-user-with-that-email'
     return i18n.t('share_licenses.teacher_not_found')
-  else if /Teacher Accounts can only look up other Teacher Accounts/.test(message)
+  else if error.errorID is 'cant-fetch-nonteacher-by-email'
     return i18n.t('share_licenses.teacher_not_valid')
   else
-    return message
+    return error.message or error
 
 module.exports = ShareLicensesStoreModule =
   namespaced: true
@@ -50,8 +50,7 @@ module.exports = ShareLicensesStoreModule =
         api.prepaids.addJoiner({prepaidID: state._prepaid._id, userID: user._id}).then =>
           commit('addTeacher', user)
       .catch (error) =>
-        console.log error
-        commit('setError', translateError(error.responseJSON?.message or error.message or error))
+        commit('setError', translateError(error.responseJSON or error))
   getters:
     prepaid: (state) ->
       _.assign({}, state._prepaid, {
