@@ -231,7 +231,6 @@ module.exports =
     prepaids = yield Prepaid.find(query, {creator: 1, startDate: 1, endDate: 1, maxRedeemers: 1, redeemers: 1}).lean()
     console.log new Date().toISOString(), 'prepaids', prepaids.length
     teacherIds = []
-    # NOTE: May not correctly account for shared licenses
     teacherIds.push(prepaid.creator) for prepaid in prepaids
     teachers = yield User.find({_id: {$in: teacherIds}}, {_id: 1, permissions: 1, name: 1, emailLower: 1}).lean()
     adminMap = {}
@@ -303,6 +302,8 @@ module.exports =
       userPrepaidsMap[prepaid.creator.valueOf()].push(prepaid)
       # NOTE: May not correctly account for shared licenses
       userIDs.push prepaid.creator
+      for joiner in prepaid.joiners ? []
+        userIDs.push joiner.userID + ''
       for redeemer in prepaid.redeemers ? []
         redeemerIDs.push redeemer.userID + ""
         redeemerPrepaidMap[redeemer.userID + ""] = prepaid._id.valueOf()
