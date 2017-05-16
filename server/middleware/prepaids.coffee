@@ -161,14 +161,14 @@ module.exports =
   
   fetchJoiners: wrap (req, res) ->
     if not req.user?.isTeacher()
-      throw new errors.Forbidden('Must be a teacher to share licenses')
+      throw new errors.Forbidden('Must be a teacher to fetch joiners for a license.')
   
     prepaid = yield database.getDocFromHandle(req, Prepaid)
     if not prepaid
       throw new errors.NotFound('Prepaid not found.')
   
     unless prepaid.get('creator').equals(req.user._id)
-      throw new errors.Forbidden('You may not share licenses you do not own.')
+      throw new errors.Forbidden('You may not fetch the joiners of a license you do not own.')
     unless prepaid.get('type') is 'course'
       throw new errors.Forbidden('This prepaid is not of type "course".')
   
