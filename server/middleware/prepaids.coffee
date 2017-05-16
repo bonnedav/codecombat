@@ -143,11 +143,8 @@ module.exports =
     
     query =
       _id: prepaid._id
-    update = { $push: { joiners : { userID: joiner._id } }}
+    update = { $addToSet: { joiners : { userID: joiner._id } }}
     result = yield Prepaid.update(query, update)
-    if result.nModified is 0
-      @logError(req.user, "POST prepaid redeemer lost race on maxRedeemers")
-      throw new errors.UnprocessableEntity('User was not enrolled with this set of enrollments (race)')
     
     context =
       email_id: sendwithus.templates.share_licenses_joiner
