@@ -32,7 +32,6 @@ describe 'ShareLicensesModal', ->
       beforeEach (done) ->
         @joiner3 = factories.makeUser({firstName: 'joiner', lastName: 'three'})
         spyOn(api.prepaids, 'addJoiner').and.returnValue Promise.resolve(@prepaid.toJSON())
-        console.log _.pick(@joiner3.toJSON(), '_id', 'name', 'email', 'firstName', 'lastName')
         spyOn(api.users, 'getByEmail').and.returnValue Promise.resolve(_.pick(@joiner3.toJSON(), ['_id', 'name', 'email', 'firstName', 'lastName']))
         _.defer ->
           done()
