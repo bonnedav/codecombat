@@ -22,11 +22,17 @@ describe 'ShareLicensesModal', ->
       _.defer ->
         done()
     
-    it 'shows a list of joiners', ->
-      expect(@modal.$el.html()).toContain('joiner one')
-      expect(@modal.$el.html()).toContain(@joiner1.get('email'))
-      expect(@modal.$el.html()).toContain('joiner two')
-      expect(@modal.$el.html()).toContain(@joiner2.get('email'))
+    it 'shows a list of joiners in reverse order', ->
+      joiners = @modal.shareLicensesComponent.prepaid.joiners
+      expect(joiners[0]?.firstName).toBe('teacher')
+      expect(joiners[0]?.lastName).toBe('one')
+      expect(joiners[0]?.email).toBe(@teacher.get('email'))
+      expect(joiners[1]?.firstName).toBe('joiner')
+      expect(joiners[1]?.lastName).toBe('two')
+      expect(joiners[1]?.email).toBe(@joiner2.get('email'))
+      expect(joiners[2]?.firstName).toBe('joiner')
+      expect(joiners[2]?.lastName).toBe('one')
+      expect(joiners[2]?.email).toBe(@joiner1.get('email'))
       
     describe 'Add Teacher button', ->
       beforeEach (done) ->
