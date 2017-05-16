@@ -62,7 +62,7 @@ module.exports = class EnrollmentsView extends RootView
     @listenToOnce @classrooms, 'sync', @onceClassroomsSync
     @supermodel.trackRequest @classrooms.fetchMine()
     @prepaids = new Prepaids()
-    @supermodel.trackRequest @prepaids.fetchMineAndShared(me.id)
+    @supermodel.trackRequest @prepaids.fetchMineAndShared()
     @listenTo @prepaids, 'sync', ->
       @prepaids.each (prepaid) =>
         prepaid.creator = new User()

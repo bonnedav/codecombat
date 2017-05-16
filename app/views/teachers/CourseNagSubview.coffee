@@ -15,7 +15,7 @@ module.exports = class CourseNagSubview extends CocoView
   initialize: (options) ->
     super(options)
     @prepaids = new Prepaids()
-    @supermodel.trackRequest @prepaids.fetchMineAndShared(me.id)
+    @supermodel.trackRequest @prepaids.fetchMineAndShared()
     @listenTo @prepaids, 'sync', @gotPrepaids
     @shown = false
 
