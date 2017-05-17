@@ -43,9 +43,9 @@ module.exports = ShareLicensesStoreModule =
           fullJoiner = _.find(joiners, {_id: slimJoiner.userID})
           _.assign(slimJoiner, fullJoiner)
       .then ->
-        prepaid.joiners.push(_.assign({ userID: me.id }, me.pick('name', 'firstName', 'lastName', 'email')))
         commit('setPrepaid', prepaid)
     addTeacher: ({ commit, state }, email) ->
+      return if _.isEmpty(email)
       api.users.getByEmail(email).then (user) =>
         api.prepaids.addJoiner({prepaidID: state._prepaid._id, userID: user._id}).then =>
           commit('addTeacher', user)
@@ -53,12 +53,15 @@ module.exports = ShareLicensesStoreModule =
         commit('setError', translateError(error.responseJSON or error))
   getters:
     prepaid: (state) ->
+      joinersAndMe = state._prepaid.joiners.concat _.assign({ userID: me.id }, me.pick('name', 'firstName', 'lastName', 'email'))
       _.assign({}, state._prepaid, {
-        joiners: state._prepaid.joiners.map((joiner) ->
+        joiners: joinersAndMe.map((joiner) ->
           _.assign {}, joiner,
             licensesUsed: _.countBy(state._prepaid.redeemers, (redeemer) ->
               (not redeemer.teacherID and joiner.userID is me.id) or (redeemer.teacherID is joiner.userID)
             )[true] or 0
         ).reverse()
       })
+    rawJoiners: (state) ->
+      state._prepaid.joiners.map (joiner) -> _.pick(joiner, 'userID')
     error: (state) -> state.error

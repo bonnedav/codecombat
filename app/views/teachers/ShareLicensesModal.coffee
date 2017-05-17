@@ -12,7 +12,7 @@ module.exports = class ShareLicensesModal extends ModalView
   initialize: (options={}) ->
     @shareLicensesComponent = null
     store.registerModule('modal', ShareLicensesStoreModule)
-    store.dispatch('modal/setPrepaid', options.prepaid)
+    store.dispatch('modal/setPrepaid', options.prepaid.attributes)
   afterRender: ->
     target = @$el.find('#share-licenses-component')
     if @shareLicensesComponent
@@ -22,6 +22,8 @@ module.exports = class ShareLicensesModal extends ModalView
         el: target[0]
         store
       })
+      @shareLicensesComponent.$on 'setJoiners', (prepaidID, joiners) =>
+        @trigger 'setJoiners', prepaidID, joiners
   destroy: ->
     @shareLicensesComponent.$destroy()
     super(arguments...)
@@ -33,7 +35,7 @@ ShareLicensesComponent = Vue.extend
   data: ->
     me: me
     teacherSearchInput: ''
-  computed: _.assign({}, Vuex.mapGetters(prepaid: 'modal/prepaid', error: 'modal/error'))
+  computed: _.assign({}, Vuex.mapGetters(prepaid: 'modal/prepaid', error: 'modal/error', rawJoiners: 'modal/rawJoiners'))
   watch:
     teacherSearchInput: ->
       @$store.commit('modal/setError', '')
@@ -41,7 +43,9 @@ ShareLicensesComponent = Vue.extend
     'share-licenses-joiner-row': require('./ShareLicensesJoinerRow')
   methods:
     addTeacher: ->
-      @$store.dispatch('modal/addTeacher', @teacherSearchInput)
+      @$store.dispatch('modal/addTeacher', @teacherSearchInput).then =>
+        # Send an event back to backbone-land so it can update its model
+        @$emit 'setJoiners', @prepaid._id, @rawJoiners
   created: ->
   destroyed: ->
     @$store.commit('modal/clearData')

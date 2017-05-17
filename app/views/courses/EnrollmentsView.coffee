@@ -147,5 +147,8 @@ module.exports = class EnrollmentsView extends RootView
 
   onClickShareLicensesLink: (e) ->
     prepaidID = $(e.currentTarget).data('prepaidId')
-    @shareLicensesModal = new ShareLicensesModal({prepaid: @prepaids.get(prepaidID).attributes})
+    @shareLicensesModal = new ShareLicensesModal({prepaid: @prepaids.get(prepaidID)})
+    @shareLicensesModal.on 'setJoiners', (prepaidID, joiners) =>
+      prepaid = @prepaids.get(prepaidID)
+      prepaid.set({ joiners })
     @openModalView(@shareLicensesModal)

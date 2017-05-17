@@ -47,7 +47,7 @@ describe 'ShareLicensesModal', ->
         @modal.shareLicensesComponent.teacherSearchInput = @joiner3.get('email')
         @modal.shareLicensesComponent.addTeacher().then =>
           joiners = @modal.shareLicensesComponent.prepaid.joiners
-          expect(joiners[0].firstName).toBe('joiner')
-          expect(joiners[0].lastName).toBe('three')
-          expect(joiners[0].email).toBe(@joiner3.get('email'))
+          expect(joiners[1].firstName).toBe('joiner')
+          expect(joiners[1].lastName).toBe('three')
+          expect(joiners[1].email).toBe(@joiner3.get('email'))
           done()
