@@ -19,6 +19,7 @@ describe 'ShareLicensesModal', ->
       @modal = new ShareLicensesModal({ prepaid: @prepaid.attributes })
       @modal.render()
       @store = @modal.shareLicensesComponent.$store
+      # TODO How do I wait for VueX to finish updating?
       _.defer ->
         done()
     
