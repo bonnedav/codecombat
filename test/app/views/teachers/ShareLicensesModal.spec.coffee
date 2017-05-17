@@ -16,7 +16,7 @@ describe 'ShareLicensesModal', ->
           _.pick(@joiner1.attributes, '_id', 'name', 'email', 'firstName', 'lastName')
           _.pick(@joiner2.attributes, '_id', 'name', 'email', 'firstName', 'lastName')
         ])
-      @modal = new ShareLicensesModal({ prepaid: @prepaid.attributes })
+      @modal = new ShareLicensesModal({ prepaid: @prepaid })
       @modal.render()
       @store = @modal.shareLicensesComponent.$store
       # TODO How do I wait for VueX to finish updating?
